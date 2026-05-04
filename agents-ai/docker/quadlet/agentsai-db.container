@@ -1,0 +1,20 @@
+﻿[Unit]
+Description=PostgreSQL for AgentsAI
+
+[Container]
+Image=docker.io/library/postgres:17-alpine
+ContainerName=agentsai-db
+Pod=agentsai.pod
+Volume=agentsai-pgdata:/var/lib/postgresql/data
+EnvironmentFile=%h/.config/containers/systemd/agentsai.env
+HealthCmd=pg_isready -U $POSTGRES_USER -d $POSTGRES_DB -h localhost || exit 1
+HealthInterval=15s
+HealthTimeout=5s
+HealthRetries=5
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

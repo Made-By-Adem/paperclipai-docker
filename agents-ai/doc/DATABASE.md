@@ -1,0 +1,188 @@
+# Database
+
+AgentsAI uses PostgreSQL via [Drizzle ORM](https://orm.drizzle.team/). There are three ways to run the database, from simplest to most production-ready.
+
+## 1. Embedded PostgreSQL — zero config
+
+If you don't set `DATABASE_URL`, the server automatically starts an embedded PostgreSQL instance and manages a local data directory.
+
+```sh
+pnpm dev
+```
+
+That's it. On first start the server:
+
+1. Creates a `~/.agentsai/instances/default/db/` directory for storage
+2. Ensures the `agentsai` database exists
+3. Runs migrations automatically for empty databases
+4. Starts serving requests
+
+Data persists across restarts in `~/.agentsai/instances/default/db/`. To reset local dev data, delete that directory.
+
+If you need to apply pending migrations manually, run:
+
+```sh
+pnpm db:migrate
+```
+
+When `DATABASE_URL` is unset, this command targets the current embedded PostgreSQL instance for your active AgentsAI config/instance.
+
+Issue reference mentions follow the normal migration path: the schema migration creates the tracking table, but it does not backfill historical issue titles, descriptions, comments, or documents automatically.
+
+To backfill existing content manually after migrating, run:
+
+```sh
+pnpm issue-references:backfill
+# optional: limit to one company
+pnpm issue-references:backfill -- --company <company-id>
+```
+
+Future issue, comment, and document writes sync references automatically without running the backfill command.
+
+This mode is ideal for local development and one-command installs.
+
+Docker note: the Docker quickstart image also uses embedded PostgreSQL by default. Persist `/agentsai` to keep DB state across container restarts (see `doc/DOCKER.md`).
+
+## 2. Local PostgreSQL (Docker)
+
+For a full PostgreSQL server locally, use the included Docker Compose setup:
+
+```sh
+docker compose up -d
+```
+
+This starts PostgreSQL 17 on `localhost:5432`. Then set the connection string:
+
+```sh
+cp .env.example .env
+# .env already contains:
+# DATABASE_URL=postgres://agentsai:agentsai@localhost:5432/agentsai
+```
+
+Run migrations:
+
+```sh
+DATABASE_URL=postgres://agentsai:agentsai@localhost:5432/agentsai \
+  pnpm db:migrate
+```
+
+Start the server:
+
+```sh
+pnpm dev
+```
+
+## 3. Hosted PostgreSQL (Supabase)
+
+For production, use a hosted PostgreSQL provider. [Supabase](https://supabase.com/) is a good option with a free tier.
+
+### Setup
+
+1. Create a project at [database.new](https://database.new)
+2. Go to **Project Settings > Database > Connection string**
+3. Copy the URI and replace the password placeholder with your database password
+
+### Connection string
+
+Supabase offers two connection modes:
+
+**Direct connection** (port 5432) — use for migrations and one-off scripts:
+
+```
+postgres://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+```
+
+**Connection pooling via Supavisor** (port 6543) — use for the application:
+
+```
+postgres://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+```
+
+### Configure
+
+For the application runtime, use a direct PostgreSQL connection unless the database client has explicit prepared-statement configuration for your pooling mode:
+
+```sh
+DATABASE_URL=postgres://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+```
+
+If you later run the app with a pooled runtime URL, set `DATABASE_MIGRATION_URL` to the direct connection URL. AgentsAI uses it for startup schema checks/migrations and plugin namespace migrations, while the app continues to use `DATABASE_URL` for runtime queries:
+
+```sh
+DATABASE_URL=postgres://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+DATABASE_MIGRATION_URL=postgres://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+```
+
+If your hosted database requires transaction-pooling-only connections, use a direct or session-pooled connection for AgentsAI until runtime pooling support is documented in this guide. Do not edit database client source files as part of deployment setup.
+
+### Push the schema
+
+```sh
+# Use the direct connection (port 5432) for schema changes
+DATABASE_URL=postgres://postgres.[PROJECT-REF]:[PASSWORD]@...5432/postgres \
+  pnpm db:migrate
+```
+
+### Free tier limits
+
+- 500 MB database storage
+- 200 concurrent connections
+- Projects pause after 1 week of inactivity
+
+See [Supabase pricing](https://supabase.com/pricing) for current details.
+
+## Switching between modes
+
+The database mode is controlled by `DATABASE_URL`:
+
+| `DATABASE_URL` | Mode |
+|---|---|
+| Not set | Embedded PostgreSQL (`~/.agentsai/instances/default/db/`) |
+| `postgres://...localhost...` | Local Docker PostgreSQL |
+| `postgres://...supabase.com...` | Hosted Supabase |
+
+Your Drizzle schema (`packages/db/src/schema/`) stays the same regardless of mode.
+
+## Plugin database namespaces
+
+The plugin runtime tracks plugin-owned database namespaces and migrations in `plugin_database_namespaces` and `plugin_migrations`. Hosted deployments that separate runtime and migration connections should set `DATABASE_MIGRATION_URL`; plugin namespace migration work uses the migration connection when present.
+
+## Backups
+
+AgentsAI supports automatic and manual database backups. See `doc/DEVELOPING.md` for the current `agentsai db:backup` / `pnpm db:backup` commands and backup retention configuration.
+
+## Secret storage
+
+AgentsAI stores secret metadata and versions in:
+
+- `company_secrets`
+- `company_secret_versions`
+
+For local/default installs, the active provider is `local_encrypted`:
+
+- Secret material is encrypted at rest with a local master key.
+- Default key file: `~/.agentsai/instances/default/secrets/master.key` (auto-created if missing).
+- CLI config location: `~/.agentsai/instances/default/config.json` under `secrets.localEncrypted.keyFilePath`.
+
+Optional overrides:
+
+- `PAPERCLIP_SECRETS_MASTER_KEY` (32-byte key as base64, hex, or raw 32-char string)
+- `PAPERCLIP_SECRETS_MASTER_KEY_FILE` (custom key file path)
+
+Strict mode to block new inline sensitive env values:
+
+```sh
+PAPERCLIP_SECRETS_STRICT_MODE=true
+```
+
+You can set strict mode and provider defaults via:
+
+```sh
+pnpm agentsai configure --section secrets
+```
+
+Inline secret migration command:
+
+```sh
+pnpm secrets:migrate-inline-env --apply
+```

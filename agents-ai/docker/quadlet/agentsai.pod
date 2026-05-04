@@ -1,0 +1,3 @@
+﻿[Pod]
+PodName=agentsai
+PublishPort=3100:3100

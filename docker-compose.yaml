@@ -4,11 +4,11 @@ services:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: paperclip
+      POSTGRES_USER: agents
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-      POSTGRES_DB: paperclip
+      POSTGRES_DB: agents
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U paperclip -d paperclip"]
+      test: ["CMD-SHELL", "pg_isready -U agents -d agents"]
       interval: 2s
       timeout: 5s
       retries: 30
@@ -29,9 +29,9 @@ services:
       - /tmp
       - /run/postgresql
     networks:
-      - paperclip
+      - agents
 
-  # ── Paperclip Server ───────────────────────────────────────────
+  # ── Agents Server ──────────────────────────────────────────────
   server:
     build:
       context: .
@@ -40,7 +40,7 @@ services:
     ports:
       - "127.0.0.1:3100:3100"
     environment:
-      DATABASE_URL: postgres://paperclip:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/paperclip
+      DATABASE_URL: postgres://agents:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/agents
       PORT: "3100"
       HOST: "0.0.0.0"
       SERVE_UI: "true"
@@ -48,7 +48,25 @@ services:
       PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
       PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
       PAPERCLIP_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL}"
+      # Aliases for renamed env var names in compiled code
+      Agents_DEPLOYMENT_MODE: "authenticated"
+      Agents_DEPLOYMENT_EXPOSURE: "private"
+      Agents_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL}"
       BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET:?Generate with: openssl rand -hex 32}"
+      # ── cx-assist cross-domain SSO handoff ──
+      # Same value as cx-assist's JWT_SECRET (or AGENTS_SSO_SECRET if set there).
+      # Required for the "Sign in from cx-assist" flow. See docs/SSO_HANDOFF.md
+      JWT_SECRET: "${JWT_SECRET:-}"
+      AGENTS_SSO_SECRET: "${AGENTS_SSO_SECRET:-}"
+      # ── Cognito SSO (optional — leave unset to fall back to email/password) ──
+      COGNITO_REGION: "${COGNITO_REGION:-}"
+      COGNITO_USER_POOL_ID: "${COGNITO_USER_POOL_ID:-}"
+      COGNITO_DOMAIN: "${COGNITO_DOMAIN:-}"
+      COGNITO_CLIENT_ID: "${COGNITO_CLIENT_ID:-}"
+      COGNITO_CLIENT_SECRET: "${COGNITO_CLIENT_SECRET:-}"
+      COGNITO_ADMIN_CHECK_MODE: "${COGNITO_ADMIN_CHECK_MODE:-allow_all}"
+      COGNITO_ADMIN_VERIFY_URL: "${COGNITO_ADMIN_VERIFY_URL:-}"
+      COGNITO_ADMIN_VERIFY_TOKEN: "${COGNITO_ADMIN_VERIFY_TOKEN:-}"
       # API keys for AI agents (optional)
       ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
       OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
@@ -71,9 +89,8 @@ services:
       retries: 3
       start_period: 60s
     networks:
-      - paperclip
+      - agents
 
 networks:
-  paperclip:
+  agents:
     driver: bridge
-

@@ -1,0 +1,62 @@
+{
+  "name": "agentsai",
+  "version": "0.3.1",
+  "description": "AgentsAI CLI — orchestrate AI agent teams to run a business",
+  "type": "module",
+  "bin": {
+    "agentsai": "./dist/index.js"
+  },
+  "keywords": [
+    "agentsai",
+    "ai",
+    "agents",
+    "orchestration",
+    "cli"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentsai/agentsai",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/agentsai/agentsai",
+  "bugs": {
+    "url": "https://github.com/agentsai/agentsai/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "node --input-type=module -e \"import esbuild from 'esbuild'; import config from './esbuild.config.mjs'; await esbuild.build(config);\" && chmod +x dist/index.js",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.10.0",
+    "@agentsai/adapter-claude-local": "workspace:*",
+    "@agentsai/adapter-codex-local": "workspace:*",
+    "@agentsai/adapter-cursor-local": "workspace:*",
+    "@agentsai/adapter-gemini-local": "workspace:*",
+    "@agentsai/adapter-opencode-local": "workspace:*",
+    "@agentsai/adapter-pi-local": "workspace:*",
+    "@agentsai/adapter-openclaw-gateway": "workspace:*",
+    "@agentsai/adapter-utils": "workspace:*",
+    "@agentsai/db": "workspace:*",
+    "@agentsai/server": "workspace:*",
+    "@agentsai/shared": "workspace:*",
+    "drizzle-orm": "0.38.4",
+    "dotenv": "^17.0.1",
+    "commander": "^13.1.0",
+    "embedded-postgres": "^18.1.0-beta.16",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

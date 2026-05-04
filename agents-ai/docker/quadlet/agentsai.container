@@ -1,0 +1,23 @@
+﻿[Unit]
+Description=AgentsAI AI Agent Orchestrator
+Requires=agentsai-db.service
+After=agentsai-db.service
+
+[Container]
+Image=agentsai-local
+ContainerName=agentsai
+Pod=agentsai.pod
+Volume=%h/.local/share/agentsai:/agentsai:Z
+Environment=HOST=0.0.0.0
+Environment=PAPERCLIP_HOME=/agentsai
+Environment=PAPERCLIP_DEPLOYMENT_MODE=authenticated
+Environment=PAPERCLIP_DEPLOYMENT_EXPOSURE=private
+Environment=PAPERCLIP_PUBLIC_URL=http://localhost:3100
+EnvironmentFile=%h/.config/containers/systemd/agentsai.env
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target

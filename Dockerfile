@@ -1,6 +1,6 @@
 # =============================================================================
-# Paperclip - Multi-stage Docker build
-# Builds from source: https://github.com/paperclipai/paperclip
+# AgentsAI - Multi-stage Docker build
+# Builds from source: https://github.com/nitesh-okra/agents-ai
 # =============================================================================
 
 # --- Stage 1: Base image with system dependencies ---
@@ -36,20 +36,20 @@ RUN usermod -u $USER_UID --non-unique node \
   && groupmod -g $USER_GID --non-unique node \
   && usermod -g $USER_GID -d /paperclip node
 
-# --- Stage 2: Clone repo and install dependencies ---
+# --- Stage 2: Copy local source and install dependencies ---
 FROM base AS deps
 WORKDIR /app
 
-RUN git clone --depth 1 https://github.com/paperclipai/paperclip.git . \
-  && pnpm install --frozen-lockfile
+COPY agents-ai/ .
+RUN rm -f pnpm-lock.yaml && pnpm install
 
 # --- Stage 3: Build all packages ---
 FROM deps AS build
 WORKDIR /app
 
-RUN pnpm --filter @paperclipai/ui build \
-  && pnpm --filter @paperclipai/plugin-sdk build \
-  && pnpm --filter @paperclipai/server build \
+RUN pnpm --filter @agentsai/ui build \
+  && pnpm --filter @agentsai/plugin-sdk build \
+  && pnpm --filter @agentsai/server build \
   && test -f server/dist/index.js || (echo "ERROR: server build output missing" && exit 1)
 
 # --- Stage 4: Production image ---

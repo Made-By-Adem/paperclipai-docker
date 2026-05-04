@@ -1,0 +1,37 @@
+{
+  "name": "@agentsai/plugin-kitchen-sink-example",
+  "version": "0.1.0",
+  "description": "Reference plugin that demonstrates the full AgentsAI plugin surface area in one package",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "agentsaiPlugin": {
+    "manifest": "./dist/manifest.js",
+    "worker": "./dist/worker.js",
+    "ui": "./dist/ui/"
+  },
+  "scripts": {
+    "prebuild": "pnpm --filter @agentsai/plugin-sdk ensure-build-deps",
+    "build": "tsc && node ./scripts/build-ui.mjs",
+    "clean": "rm -rf dist",
+    "typecheck": "pnpm --filter @agentsai/plugin-sdk ensure-build-deps && tsc --noEmit"
+  },
+  "dependencies": {
+    "@agentsai/plugin-sdk": "workspace:*",
+    "@agentsai/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.3",
+    "@types/node": "^24.6.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

@@ -1,29 +1,29 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/paperclipai/paperclip/master/doc/assets/header.png" alt="Paperclip" width="500" />
+  <img src="https://raw.githubusercontent.com/agentsai/agentsai/master/doc/assets/header.png" alt="AgentsAI" width="500" />
   <br />
   <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" alt="Docker" width="80" />
 </p>
 
-<h1 align="center">🐳 Paperclip Docker</h1>
+<h1 align="center">🐳 Agents Docker</h1>
 
 <p align="center">
-  <strong>Self-host Paperclip on your own server — built from source, Dockerized, ready to go.</strong>
+  <strong>Self-host Agents (cx-assist platform feature) on your own server — built from source, Dockerized, ready to go.</strong>
 </p>
 
 <p align="center">
-  <a href="https://paperclip.ing"><img src="https://img.shields.io/badge/🌐%20paperclip.ing-official%20site-8B5CF6.svg" alt="Official Site" /></a>
-  <a href="https://github.com/paperclipai/paperclip"><img src="https://img.shields.io/badge/📦%20upstream-paperclipai%2Fpaperclip-6D28D9.svg?logo=github&logoColor=white" alt="Upstream Repo" /></a>
-  <a href="https://github.com/MadeByAdem/paperclipai-docker/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a>
+  <a href="https://agentsai.ing"><img src="https://img.shields.io/badge/🌐%20agentsai.ing-official%20site-8B5CF6.svg" alt="Official Site" /></a>
+  <a href="https://github.com/agentsai/agentsai"><img src="https://img.shields.io/badge/📦%20upstream-agentsai%2Fagentsai-6D28D9.svg?logo=github&logoColor=white" alt="Upstream Repo" /></a>
+  <a href="https://github.com/MadeByAdem/agentsai-docker/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a>
   <img src="https://img.shields.io/badge/docker-compose%20v2-2496ED.svg?logo=docker&logoColor=white" alt="Docker Compose" />
-  <a href="https://github.com/paperclipai/paperclip"><img src="https://img.shields.io/github/stars/paperclipai/paperclip?style=flat&logo=github&label=paperclip%20stars" alt="Stars" /></a>
+  <a href="https://github.com/agentsai/agentsai"><img src="https://img.shields.io/github/stars/agentsai/agentsai?style=flat&logo=github&label=agentsai%20stars" alt="Stars" /></a>
 </p>
 
 ---
 
 > [!WARNING]
-> ⚠️ This is an **unofficial, community-maintained** Docker setup. It is **not affiliated with, endorsed by, or supported by** the Paperclip team or [paperclipai](https://github.com/paperclipai). Use at your own risk. For official support, refer to the [upstream repository](https://github.com/paperclipai/paperclip).
+> ⚠️ This is an **unofficial, community-maintained** Docker setup. It is **not affiliated with, endorsed by, or supported by** the AgentsAI team or [agentsai](https://github.com/agentsai). Use at your own risk. For official support, refer to the [upstream repository](https://github.com/agentsai/agentsai).
 
-> **What is Paperclip?** Paperclip is an open-source orchestration platform for autonomous AI companies. If OpenClaw is an *employee*, Paperclip is the *company*. This repository lets you self-host it in Docker — built from source with every tool included, reverse-proxy ready, zero ports exposed.
+> **What is Agents?** Agents is the cx-assist platform's autonomous AI orchestration feature, deployed at `agents.cx-assist.io`. This repository builds and ships it in Docker — built from source with every tool included, reverse-proxy ready, zero ports exposed.
 
 ---
 
@@ -47,11 +47,11 @@
 
 ## 📦 What's Included
 
-This project adds a production-ready Docker layer on top of the official Paperclip source:
+This project adds a production-ready Docker layer on top of the official AgentsAI source:
 
 | | Feature |
 | --- | --- |
-| 🏗️ | **Full Paperclip build from source** — UI, server, database, all agent adapters |
+| 🏗️ | **Full AgentsAI build from source** — UI, server, database, all agent adapters |
 | 🤖 | **Every CLI tool pre-installed** — Claude Code, Codex, opencode-ai, GitHub CLI, ripgrep |
 | 🔒 | **Binds to `127.0.0.1` only** — designed for Cloudflare Tunnel or any reverse proxy |
 | 🔑 | **UID/GID matching entrypoint** — seamless volume permissions, no root needed |
@@ -70,7 +70,7 @@ This project adds a production-ready Docker layer on top of the official Papercl
 </table>
 </div>
 
-Everything else is standard Paperclip — no custom code.
+Everything else is standard AgentsAI — no custom code.
 
 ---
 
@@ -118,8 +118,8 @@ Both commands should print a version number without errors.
 ### Option A — ⚡ Automated setup (recommended)
 
 ```bash
-git clone https://github.com/MadeByAdem/paperclipai-docker.git
-cd paperclipai-docker
+git clone https://github.com/MadeByAdem/agentsai-docker.git
+cd agentsai-docker
 chmod +x setup.sh
 ./setup.sh
 ```
@@ -129,7 +129,7 @@ The setup script will automatically:
 1. ✅ Check that Docker and Docker Compose are installed
 2. 🔑 Generate a `.env` file with secure secrets
 3. 🐳 Build the Docker image from source
-4. 🚀 Start Paperclip and PostgreSQL
+4. 🚀 Start AgentsAI and PostgreSQL
 
 After setup, edit `.env` and set `PAPERCLIP_PUBLIC_URL` to your domain.
 
@@ -143,8 +143,8 @@ After setup, edit `.env` and set `PAPERCLIP_PUBLIC_URL` to your domain.
 #### Step 1 — 📥 Clone this repository
 
 ```bash
-git clone https://github.com/MadeByAdem/paperclipai-docker.git
-cd paperclipai-docker
+git clone https://github.com/MadeByAdem/agentsai-docker.git
+cd agentsai-docker
 ```
 
 #### Step 2 — 🔧 Configure environment
@@ -164,7 +164,7 @@ Edit `.env` and fill in:
 | Variable | What to do |
 | -------- | ---------- |
 | 🔑 `BETTER_AUTH_SECRET` | Paste the generated secret (`openssl rand -hex 32`) |
-| 🌍 `PAPERCLIP_PUBLIC_URL` | Set to your domain (e.g. `https://paperclip.example.com`) |
+| 🌍 `PAPERCLIP_PUBLIC_URL` | Set to your domain (e.g. `https://agents.cx-assist.io`) |
 | 🗄️ `POSTGRES_PASSWORD` | Generate a database password (`openssl rand -hex 16`) |
 
 #### Step 3 — 🐳 Deploy
@@ -174,7 +174,7 @@ docker compose up -d --build
 ```
 
 > [!NOTE]
-> ☕ The first build clones and compiles Paperclip from source — this takes a few minutes.
+> ☕ The first build clones and compiles AgentsAI from source — this takes a few minutes.
 
 #### Step 4 — ✅ Verify it's running
 
@@ -189,12 +189,12 @@ You should see log output indicating the server is active. Press `Ctrl+C` to sto
 
 ### 🎬 First Run — Instance Setup
 
-After the containers are running, you need to onboard your Paperclip instance and create the first admin account.
+After the containers are running, you need to onboard your AgentsAI instance and create the first admin account.
 
 #### Step 1 — Run the onboard wizard
 
 ```bash
-docker exec -it paperclipai-server-1 pnpm paperclipai onboard
+docker exec -it agentsai-server-1 pnpm agentsai onboard
 ```
 
 Choose **Advanced setup** and use these recommended values:
@@ -204,24 +204,24 @@ Choose **Advanced setup** and use these recommended values:
 | Database mode | External PostgreSQL (Docker Compose already provides one) |
 | LLM provider | Claude (Anthropic) — or your preferred provider |
 | Logging mode | File-based logging |
-| Log directory | `/paperclip/instances/default/logs` |
+| Log directory | `/agentsai/instances/default/logs` |
 | Deployment mode | Authenticated |
 | Exposure profile | Private network |
 | Bind host | `0.0.0.0` |
 | Server port | `3100` |
-| Allowed hostnames | Your domain (e.g. `paperclip.example.com`) |
+| Allowed hostnames | Your domain (e.g. `agentsai.example.com`) |
 | Storage provider | Local disk |
-| Storage directory | `/paperclip/instances/default/data/storage` |
+| Storage directory | `/agentsai/instances/default/data/storage` |
 
 > [!IMPORTANT]
 > Select **External PostgreSQL** — the `docker-compose.yaml` already runs a PostgreSQL 17 container. Selecting "Embedded" would create a second, conflicting database inside the server container.
 
-When prompted to start Paperclip, choose **Yes**.
+When prompted to start AgentsAI, choose **Yes**.
 
 #### Step 2 — Create the first admin account
 
 ```bash
-docker exec -it paperclipai-server-1 pnpm paperclipai auth bootstrap-ceo
+docker exec -it agentsai-server-1 pnpm agentsai auth bootstrap-ceo
 ```
 
 This generates an invite URL. Open it in your browser to create your admin account.
@@ -235,7 +235,7 @@ This generates an invite URL. Open it in your browser to create your admin accou
 
 ### 🛠 Configuring Your Instance
 
-Once Paperclip is running and you've created your admin account, configure it in this order:
+Once AgentsAI is running and you've created your admin account, configure it in this order:
 
 #### 1. Set Your Goals
 
@@ -257,7 +257,7 @@ Link the platforms your agents need to interact with — GitHub for code, Linear
 
 #### 4. Set Up Service Accounts
 
-Create dedicated agent API keys so each agent has its own identity when authenticating against Paperclip and connected services.
+Create dedicated agent API keys so each agent has its own identity when authenticating against AgentsAI and connected services.
 
 > **Example:** Generate an API key for your "Senior Engineer" agent via the Agents dashboard — store it securely, it's shown only once.
 
@@ -284,7 +284,7 @@ Skills are reusable workflow instructions (Markdown files) that tell agents *how
 
 > **Example:** Import the GStack engineering skill pack:
 > ```bash
-> npx companies.sh add paperclipai/companies/gstack
+> npx companies.sh add agentsai/companies/gstack
 > ```
 > This adds skills like `review`, `ship`, `qa`, `investigate`, and `land-and-deploy`.
 
@@ -324,7 +324,7 @@ See [🌐 Connecting a Reverse Proxy](#-connecting-a-reverse-proxy) below.
 │              │         Docker Compose          │                 │
 │              │                                 │                 │
 │              │  ┌───────────┐  ┌────────────┐  │                 │
-│              │  │ Paperclip │◄►│ PostgreSQL  │  │                 │
+│              │  │ AgentsAI │◄►│ PostgreSQL  │  │                 │
 │              │  │  :3100    │  │    17       │  │                 │
 │              │  └───────────┘  └────────────┘  │                 │
 │              └─────────────────────────────────┘                 │
@@ -347,7 +347,7 @@ In your **Cloudflare Zero Trust** dashboard, add a public hostname to your exist
 
 | Field | Value |
 | ----- | ----- |
-| Subdomain | `paperclip` |
+| Subdomain | `agentsai` |
 | Domain | `example.com` |
 | Service Type | `HTTP` |
 | URL | `localhost:3100` |
@@ -365,7 +365,7 @@ Your `cloudflared` connector picks it up automatically — no restart needed.
 ```nginx
 server {
     listen 443 ssl;
-    server_name paperclip.example.com;
+    server_name agentsai.example.com;
 
     ssl_certificate     /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
@@ -396,7 +396,7 @@ server {
 | Variable | Required | Default | Description |
 | -------- | :------: | ------- | ----------- |
 | 🔑 `BETTER_AUTH_SECRET` | ✅ | — | Auth secret. Generate with `openssl rand -hex 32` |
-| 🌍 `PAPERCLIP_PUBLIC_URL` | ✅ | — | Public URL (e.g. `https://paperclip.example.com`) |
+| 🌍 `PAPERCLIP_PUBLIC_URL` | ✅ | — | Public URL (e.g. `https://agents.cx-assist.io`) |
 | 🗄️ `POSTGRES_PASSWORD` | ✅ | — | PostgreSQL password. Generate with `openssl rand -hex 16` |
 | 🟣 `ANTHROPIC_API_KEY` | | — | API key for Claude agent adapter |
 | 🟢 `OPENAI_API_KEY` | | — | API key for Codex agent adapter |
@@ -405,7 +405,7 @@ server {
 
 ## ⚙️ Managing Your Server
 
-Common commands for managing your Paperclip instance:
+Common commands for managing your AgentsAI instance:
 
 | Action | Command |
 | ------ | ------- |
@@ -424,7 +424,7 @@ All data lives in Docker volumes — survives restarts, `down`, and rebuilds.
 | Volume | Container Path | Contents |
 | ------ | -------------- | -------- |
 | 🗄️ `pgdata` | `/var/lib/postgresql/data` | PostgreSQL database |
-| 📂 `paperclip-data` | `/paperclip` | Config, agent workspaces, instance data |
+| 📂 `agentsai-data` | `/agentsai` | Config, agent workspaces, instance data |
 
 <details>
 <summary>📥 <strong>Backup</strong></summary>
@@ -433,11 +433,11 @@ All data lives in Docker volumes — survives restarts, `down`, and rebuilds.
 
 ```bash
 # Database
-docker compose exec db pg_dump -U paperclip paperclip > backup.sql
+docker compose exec db pg_dump -U agentsai agentsai > backup.sql
 
-# Application data (volume name = <directory>_paperclip-data)
+# Application data (volume name = <directory>_agentsai-data)
 docker compose run --rm -v $(pwd):/backup server \
-  tar czf /backup/paperclip-data.tar.gz -C /paperclip .
+  tar czf /backup/agentsai-data.tar.gz -C /agentsai .
 ```
 
 <br/>
@@ -450,11 +450,11 @@ docker compose run --rm -v $(pwd):/backup server \
 
 ```bash
 # Database
-docker compose exec -T db psql -U paperclip paperclip < backup.sql
+docker compose exec -T db psql -U agentsai agentsai < backup.sql
 
 # Application data
 docker compose run --rm -v $(pwd):/backup server \
-  tar xzf /backup/paperclip-data.tar.gz -C /paperclip
+  tar xzf /backup/agentsai-data.tar.gz -C /agentsai
 ```
 
 <br/>
@@ -470,7 +470,7 @@ docker compose build --no-cache
 docker compose up -d
 ```
 
-The Dockerfile clones the latest Paperclip source on each build, so `--no-cache` pulls the newest version.
+The Dockerfile clones the latest AgentsAI source on each build, so `--no-cache` pulls the newest version.
 
 ---
 
@@ -509,7 +509,7 @@ docker compose build --build-arg USER_UID=$(id -u) --build-arg USER_GID=$(id -g)
 
 <br/>
 
-Paperclip uses WebSockets for real-time updates. Your reverse proxy must forward the `Upgrade` and `Connection` headers. See the [Nginx config](#-connecting-a-reverse-proxy) above.
+AgentsAI uses WebSockets for real-time updates. Your reverse proxy must forward the `Upgrade` and `Connection` headers. See the [Nginx config](#-connecting-a-reverse-proxy) above.
 
 <br/>
 </details>
@@ -535,7 +535,7 @@ docker compose build --no-cache
 | File | Purpose |
 | ---- | ------- |
 | 🐳 `Dockerfile` | Multi-stage build (clone → deps → build → production) |
-| 📦 `docker-compose.yaml` | PostgreSQL 17 + Paperclip server |
+| 📦 `docker-compose.yaml` | PostgreSQL 17 + AgentsAI server |
 | 🔑 `docker-entrypoint.sh` | UID/GID matching for volume permissions |
 | ⚙️ `.env.example` | Environment variable template |
 | 🚀 `setup.sh` | Automated setup script for beginners |
@@ -547,4 +547,4 @@ docker compose build --no-cache
 
 MIT &copy; 2025 [MadeByAdem](https://github.com/MadeByAdem)
 
-Paperclip itself is maintained by [paperclipai](https://github.com/paperclipai/paperclip) under its own [MIT license](https://github.com/paperclipai/paperclip/blob/master/LICENSE).
+AgentsAI itself is maintained by [agentsai](https://github.com/agentsai/agentsai) under its own [MIT license](https://github.com/agentsai/agentsai/blob/master/LICENSE).

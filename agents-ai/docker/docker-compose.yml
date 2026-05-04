@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: agentsai
+      POSTGRES_PASSWORD: agentsai
+      POSTGRES_DB: agentsai
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentsai -d agentsai"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "3100:3100"
+    environment:
+      DATABASE_URL: postgres://agentsai:agentsai@db:5432/agentsai
+      PORT: "3100"
+      SERVE_UI: "true"
+      PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
+      PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
+      PAPERCLIP_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL:-http://localhost:3100}"
+      BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET must be set}"
+    volumes:
+      - agentsai-data:/agentsai
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  agentsai-data:
