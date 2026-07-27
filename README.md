@@ -398,8 +398,12 @@ server {
 | 🔑 `BETTER_AUTH_SECRET` | ✅ | — | Auth secret. Generate with `openssl rand -hex 32` |
 | 🌍 `PAPERCLIP_PUBLIC_URL` | ✅ | — | Public URL (e.g. `https://paperclip.example.com`) |
 | 🗄️ `POSTGRES_PASSWORD` | ✅ | — | PostgreSQL password. Generate with `openssl rand -hex 16` |
-| 🟣 `ANTHROPIC_API_KEY` | | — | API key for Claude agent adapter |
-| 🟢 `OPENAI_API_KEY` | | — | API key for Codex agent adapter |
+
+> 🔒 **AI provider API keys are not environment variables.** Everything in the
+> server environment is inherited by every agent subprocess, so a prompt
+> injection could read it. Add provider keys to the encrypted secret store
+> instead and reference them per agent with `secret_ref` — see
+> [Configure Secrets](#5-configure-secrets).
 
 ---
 

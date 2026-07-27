@@ -55,9 +55,9 @@ PAPERCLIP_PUBLIC_URL=https://paperclip.example.com
 # ── Database ──────────────────────────────────────────────────
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
-# ── AI Agent API Keys (optional) ──────────────────────────────
-ANTHROPIC_API_KEY=
-OPENAI_API_KEY=
+# ── AI Agent API Keys ─────────────────────────────────────────
+# Not configured here — add them to Paperclip's encrypted secret
+# store after first login. See "Configure Secrets" in the README.
 EOF
 
     chmod 600 .env
@@ -65,7 +65,7 @@ EOF
     echo "✅ .env created with generated secrets"
     echo ""
     echo "   ⚠️  Edit .env and set PAPERCLIP_PUBLIC_URL to your domain"
-    echo "   ⚠️  Add your AI provider API keys (ANTHROPIC_API_KEY, OPENAI_API_KEY)"
+    echo "   ⚠️  Add your AI provider API keys via the secret store after first login"
 fi
 
 echo ""

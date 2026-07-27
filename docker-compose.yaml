@@ -13,7 +13,7 @@ services:
       timeout: 5s
       retries: 30
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     # ── Hardening ──
     cap_drop:
       - ALL
@@ -50,11 +50,13 @@ services:
       PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
       PAPERCLIP_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL}"
       BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET:?Generate with: openssl rand -hex 32}"
-      # API keys for AI agents (optional)
-      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
-      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      # AI provider API keys are deliberately NOT set here. Anything in this
+      # environment is inherited by every agent subprocess, so a prompt
+      # injection could read it. Store them in Paperclip's encrypted secret
+      # store instead and reference them per agent with secret_ref —
+      # see "Configure Secrets" in the README.
     volumes:
-      - ./data/paperclip:/paperclip
+      - paperclip-data:/paperclip
     depends_on:
       db:
         condition: service_healthy
@@ -73,6 +75,10 @@ services:
       start_period: 60s
     networks:
       - paperclip
+
+volumes:
+  pgdata:
+  paperclip-data:
 
 networks:
   paperclip:
