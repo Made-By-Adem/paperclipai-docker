@@ -40,17 +40,32 @@ RUN usermod -u $USER_UID --non-unique node \
 FROM base AS deps
 WORKDIR /app
 
-# Pinned upstream revision. Bump deliberately — an unpinned clone silently
-# changes what gets built, and a cached layer keeps serving a stale checkout.
-# 8316ceb adds the Better Auth `issuer` column to the Drizzle account schema
-# (upstream #12396); without it Better Auth 1.7 emits broken SQL and sign-in
-# fails with a 500. Later main currently breaks on the semantic-action-catalog
-# check, so stay on this revision until that is fixed upstream.
-ARG PAPERCLIP_REF=8316ceb0b9cf5f119381e7ff0f9a9f1a65f9eac0
+# Upstream revision to build. "latest" resolves to the newest vX.Y.Z release
+# tag; pass a tag or commit SHA via --build-arg to pin a specific revision.
+ARG PAPERCLIP_REF=latest
 
-RUN git init -q . \
+# The release tag list is re-fetched on every build and only changes when a new
+# tag is published, so it invalidates the cached clone exactly when needed —
+# a plain `git fetch` layer would keep serving the first checkout forever.
+ADD https://api.github.com/repos/paperclipai/paperclip/git/matching-refs/tags/v /tmp/paperclip-tags.json
+
+RUN ref="$PAPERCLIP_REF" \
+  && if [ "$ref" = latest ]; then \
+    ref=$(node -e ' \
+      const tags = require("/tmp/paperclip-tags.json") \
+        .map(r => r.ref.replace("refs/tags/", "")) \
+        .filter(t => /^v\d+\.\d+\.\d+$/.test(t)) \
+        .sort((a, b) => { \
+          const x = a.slice(1).split(".").map(Number), y = b.slice(1).split(".").map(Number); \
+          return x[0] - y[0] || x[1] - y[1] || x[2] - y[2]; \
+        }); \
+      if (!tags.length) process.exit(1); \
+      console.log(tags.at(-1));'); \
+  fi \
+  && echo "Building paperclip $ref" \
+  && git init -q . \
   && git remote add origin https://github.com/paperclipai/paperclip.git \
-  && git fetch --depth 1 origin "$PAPERCLIP_REF" \
+  && git fetch --depth 1 origin "$ref" \
   && git checkout -q FETCH_HEAD \
   && pnpm install --frozen-lockfile
 
@@ -59,10 +74,32 @@ FROM deps AS build
 WORKDIR /app
 
 # @paperclipai/paperclip-runner compiles a Rust binary (paperclip-runnerd) as
-# part of the server build. Matches the toolchain upstream's own Dockerfile uses.
+# part of the server build. Debian's packaged rustc lags the runner's crates
+# (trixie ships 1.85), so mirror upstream's Dockerfile: install a pinned,
+# checksum-verified rustup and let the runner's rust-toolchain.toml pick the
+# compiler. rustup doesn't pull in a C toolchain the way apt's cargo did.
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends cargo rustc \
+  && apt-get install -y --no-install-recommends gcc libc6-dev pkg-config \
   && rm -rf /var/lib/apt/lists/*
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+ARG RUSTUP_VERSION=1.29.0
+ARG RUSTUP_SHA256_AMD64=4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10
+ARG RUSTUP_SHA256_ARM64=9732d6c5e2a098d3521fca8145d826ae0aaa067ef2385ead08e6feac88fa5792
+RUN set -eux; \
+    arch="$(dpkg --print-architecture)"; \
+    case "$arch" in \
+      amd64) rustTarget="x86_64-unknown-linux-gnu"; sha256="$RUSTUP_SHA256_AMD64" ;; \
+      arm64) rustTarget="aarch64-unknown-linux-gnu"; sha256="$RUSTUP_SHA256_ARM64" ;; \
+      *) echo "unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSLo /tmp/rustup-init "https://static.rust-lang.org/rustup/archive/${RUSTUP_VERSION}/${rustTarget}/rustup-init"; \
+    echo "${sha256}  /tmp/rustup-init" | sha256sum -c -; \
+    chmod +x /tmp/rustup-init; \
+    /tmp/rustup-init -y --no-modify-path --profile minimal --default-toolchain none; \
+    rm /tmp/rustup-init; \
+    cd packages/paperclip-runner && rustup show
 
 ENV NODE_OPTIONS=--max-old-space-size=4096
 

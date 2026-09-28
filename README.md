@@ -278,6 +278,12 @@ Store API keys and tokens that agents need at runtime. Secrets are encrypted at 
 > }
 > ```
 
+> **Using a Claude subscription instead of an API key?** Log in inside the container **as the `node` user** — the server runs as `node` and can't read credentials created by root (the default for `docker compose exec`):
+> ```bash
+> docker compose exec -u node server claude login
+> ```
+> The login is stored in the `paperclip-data` volume and survives restarts and rebuilds.
+
 #### 6. Install Skills
 
 Skills are reusable workflow instructions (Markdown files) that tell agents *how* to perform specific tasks — no retraining needed. Import community skill packs or write your own.
@@ -503,6 +509,20 @@ The entrypoint auto-matches container UID/GID to your host. If it still fails, r
 
 ```bash
 docker compose build --build-arg USER_UID=$(id -u) --build-arg USER_GID=$(id -g)
+```
+
+<br/>
+</details>
+
+<details>
+<summary>🔑 <strong>Claude adapter test: "login is required" after running <code>claude login</code></strong></summary>
+
+<br/>
+
+`docker compose exec` runs as root, so a login done without `-u node` writes root-owned credentials the server can't read. Fix ownership (or just restart — the entrypoint resets it), and log in with `-u node` next time:
+
+```bash
+docker compose exec server chown -R node:node /paperclip/.claude /paperclip/.claude.json
 ```
 
 <br/>
