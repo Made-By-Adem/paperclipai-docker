@@ -5,6 +5,7 @@
 
 # Claude Code
 .claude/
+CLAUDE.local.md
 
 # Docker
 data/
